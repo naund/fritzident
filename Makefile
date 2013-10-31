@@ -12,7 +12,8 @@ fritzident: debug.o main.o netinfo.o userinfo.o
 install:
 	install -d $(BINDIR)
 	install --mode=755 $(NAME) $(BINDIR)/
-
+	install -d $(DESTDIR)/var/log
+	touch $(DESTDIR)/var/log/fritzident.log
 
 clean:
 	rm -f *.o fritzident

@@ -5,11 +5,11 @@ Maintainer: Nils Naumann <nau@gmx.net>
 Build-Depends: debhelper (>= 8.0.0)
 Standards-Version: 3.9.4
 Homepage: <insert the upstream URL, if relevant>
-#Vcs-Git: git://git.debian.org/collab-maint/fritzident.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/fritzident.git;a=summary
+Vcs-Git: https://github.com/naund/fritzident.git
+Vcs-Browser: https://github.com/naund/fritzident/
 
 Package: fritzident
 Architecture: any
 Depends: openbsd-inetd|netkit-inetd|inetutils-inetd, update-inetd, ${shlibs:Depends}, ${misc:Depends}
-Description: Daemon for child control of fritz!Box
- <insert long description, indented with spaces>
+Description: Daemon for parental control of fritz!Box
+ Replacement of the AVM FRITZ!Boc Child Protection program.

@@ -4,12 +4,14 @@ Priority: extra
 Maintainer: Nils Naumann <nau@gmx.net>
 Build-Depends: debhelper (>= 8.0.0)
 Standards-Version: 3.9.4
-Homepage: <insert the upstream URL, if relevant>
+Homepage:
 Vcs-Git: https://github.com/naund/fritzident.git
 Vcs-Browser: https://github.com/naund/fritzident/
 
 Package: fritzident
 Architecture: any
 Depends: openbsd-inetd|netkit-inetd|inetutils-inetd, update-inetd, ${shlibs:Depends}, ${misc:Depends}
-Description: Daemon for parental control of fritz!Box
- Replacement of the AVM FRITZ!Boc Child Protection program.
+Description: Daemon for parental control of AVM Fritz!Box
+ Answer Fritz!Box user identification requests.  The program  mimics the
+ standard AVM Windows application that allows the Fritz!Box to recognize
+ individual users connecting to the Internet.

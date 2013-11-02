@@ -27,13 +27,12 @@
 void debugLog(const char *fmsg, ...)
 {
 	va_list args;
-	//if (logfile == NULL) return;
 
 	va_start(args, fmsg);
 	openlog(NULL, LOG_PID, LOG_DAEMON);
 	vsyslog(LOG_DEBUG, fmsg, args);
 	closelog();
-	//fflush(logfile);
+	
 	va_end(args);
 }
 

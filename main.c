@@ -23,6 +23,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <pwd.h>
+#include <syslog.h>
 
 #include "netinfo.h"
 #include "userinfo.h"
@@ -35,36 +36,39 @@ int main(int argc, char *argv[])
 {
 	int c;
 
+	setlogmask (LOG_UPTO (LOG_NOTICE));
+
 	while (1) {
 	   int option_index = 0;
 	   static struct option long_options[] = {
-		   {"log",		required_argument, NULL, 'l'},
 		   {"domain",   required_argument, NULL, 'd'},
+		   {"verbose",   required_argument, NULL, 'v'},
 		   {"help",   required_argument, NULL, '?'},
 		   {0,         0,                 0,  0 }
 	   };
 
-       c = getopt_long(argc, argv, "l:d:",
+       c = getopt_long(argc, argv, "d:v",
                 long_options, &option_index);
        if (c == -1)
            break;
 
        switch (c) {
-		   case 'l':
-		//	   debugLogFile(optarg);
-	           break;
 		   case 'd':
 			   set_default_domain(optarg);
+			   break;
+		   case 'v': 
+                           setlogmask (LOG_UPTO (LOG_DEBUG));   
 			   break;
 		   case '?':
 			   usage(argv[0]);
 			   return 0;
 		   default:
 			   fprintf(stderr, "Unknown option\n");
-			   fprintf(stderr, "Usage: %s [-l logfile] [-d domain]\n", argv[0]);
+			   fprintf(stderr, "Usage: %s [-v] [-d domain]\n", argv[0]);
 			   return 1;
 	   }
 	}
+
 
 	add_uid_range (1000, 65533);
 	add_uid_range (65537,(uid_t) -1);
@@ -166,12 +170,12 @@ void handleCmd()
 
 void usage(const char *cmdname)
 {
-	printf("Usage: %s [-l logfile] [-d domain]\n\n", cmdname);
+	printf("Usage: %s [-d domain]\n\n", cmdname);
 	printf("Answer Fritz!Box user identification requests.\n\n");
 	printf("%s mimics the standard AVM Windows application that allows the Fritz!Box to recognize individual users connecting to the Internet.\n", cmdname);
 	printf("Options:\n");
-	printf("\t-l logfile ..... write debug messages to the specified log file\n");
 	printf("\t-d domain ...... fake a Windows domain\n");
+	printf("\t-v writing debug infos into syslog\n");
 	printf("\nLICENSE:\n");
 	printf("This utility is provided under the GNU GENERAL PUBLIC LICENSE v3.0\n(see http://www.gnu.org/licenses/gpl-3.0.txt)\n");
 }

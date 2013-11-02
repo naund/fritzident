@@ -1,8 +1,0 @@
-/var/log/fritzident.log {
-        create 660 nobody adm 
-	daily
-	missingok
-	rotate 3
-	compress
-	notifempty
-}

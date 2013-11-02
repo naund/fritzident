@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
        switch (c) {
 		   case 'l':
-			   debugLogFile(optarg);
+		//	   debugLogFile(optarg);
 	           break;
 		   case 'd':
 			   set_default_domain(optarg);
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 			   return 0;
 		   default:
 			   fprintf(stderr, "Unknown option\n");
-			   fprintf(stderr, "Usage: avmident [-l logfile] [-d domain]\n");
+			   fprintf(stderr, "Usage: %s [-l logfile] [-d domain]\n", argv[0]);
 			   return 1;
 	   }
 	}

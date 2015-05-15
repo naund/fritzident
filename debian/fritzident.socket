@@ -1,0 +1,6 @@
+[Unit]
+Description=Fritz!Box parental control socket
+
+[Socket]
+ListenStream=14013
+Accept=true

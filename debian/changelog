@@ -1,3 +1,9 @@
+fritzident (0.1-2)  saucy; urgency=low
+
+  * install with systemd
+ 
+ -- Nils Naumann <nau@gmx.net>  Mon, 25 Jan 2015 18:24:37 +0100
+
 fritzident (0.1-1)  saucy; urgency=low
 
   * Initial release

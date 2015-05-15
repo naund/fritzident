@@ -1,0 +1,3 @@
+#! /usr/bin/dh-exec
+
+debian/fritzident@.service lib/systemd/system

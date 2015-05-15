@@ -1,7 +1,7 @@
 /*
- * debug.c
+ * netinfo.h
  *
- * Copyright (C) 2013 - Andre Larbiere <andre@larbiere.eu>
+ * Copyright (C) 2013 - Unknown
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,23 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <pwd.h>
+#define UID_SYSTEM	  0				// returned for ports that are owned by a system user
+#define UID_NOT_FOUND ((uid_t)-1)   // returned if port is not found
 
-
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <syslog.h>
-
-void debugLog(const char *fmsg, ...)
-{
-	va_list args;
-
-	va_start(args, fmsg);
-	openlog(NULL, LOG_PID, LOG_DAEMON);
-	vsyslog(LOG_DEBUG, fmsg, args);
-	closelog();
-	
-	va_end(args);
-}
-
+uid_t ipv4_tcp_port_uid(const char *ipv4, unsigned int port);
+uid_t ipv4_udp_port_uid(const char *ipv4, unsigned int port);

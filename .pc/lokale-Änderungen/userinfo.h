@@ -1,7 +1,7 @@
 /*
- * debug.c
+ * userinfo.h
  *
- * Copyright (C) 2013 - Andre Larbiere <andre@larbiere.eu>
+ * Copyright (C) 2013 - Unknown
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pwd.h>
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <syslog.h>
+struct uid_range {
+	uid_t min;
+	uid_t max;
+	struct uid_range *link;
+};
 
-void debugLog(const char *fmsg, ...)
-{
-	va_list args;
+struct uid_range *add_uid_range(uid_t min, uid_t max);
+int included_uid(uid_t id);
 
-	va_start(args, fmsg);
-	openlog(NULL, LOG_PID, LOG_DAEMON);
-	vsyslog(LOG_DEBUG, fmsg, args);
-	closelog();
-	
-	va_end(args);
-}
-
+void set_default_domain(const char *domain);
+char *add_default_domain(char *username);

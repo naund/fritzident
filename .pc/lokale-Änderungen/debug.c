@@ -1,7 +1,7 @@
 /*
  * debug.c
  *
- * Copyright (C) 2013 - Andre Larbiere <andre@larbiere.eu>
+ * Copyright (C) 2013 - Unknown
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,17 +22,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syslog.h>
+
+static char *logfilename=NULL;
+static FILE *logfile=NULL;
+
+void debugLogFile(const char *file)
+{
+	if (logfilename) free(logfilename);
+	if (logfile) fclose(logfile);
+
+	logfilename = strdup(file);
+	logfile = fopen(logfilename, "a");	
+}
 
 void debugLog(const char *fmsg, ...)
 {
 	va_list args;
+	if (logfile == NULL) return;
 
 	va_start(args, fmsg);
-	openlog(NULL, LOG_PID, LOG_DAEMON);
-	vsyslog(LOG_DEBUG, fmsg, args);
-	closelog();
-	
+	vfprintf(logfile, fmsg, args);
+	fflush(logfile);
 	va_end(args);
 }
 

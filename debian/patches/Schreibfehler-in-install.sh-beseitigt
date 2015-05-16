@@ -1,0 +1,32 @@
+Description: Schreibfehler in install.sh beseitigt
+ .
+ fritzident (0.1-2)  saucy; urgency=low
+ .
+   * install with systemd
+Author: Nils Naumann <nau@gmx.net>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: https://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- fritzident-0.1.orig/install.sh
++++ fritzident-0.1/install.sh
+@@ -2,6 +2,7 @@
+ #
+ apt-get install openbsd-inetd update-inetd logrotate
+ update-inetd --remove 14013
+-install fritzident /usr/local/sbin/firtzident
+-install logrotate.fritzident /etc/logrotate.d/fritzident
++make
++install fritzident /usr/local/sbin/fritzident
++install debian/fritzident.logrotate /etc/logrotate.d/fritzident
+ update-inetd --add "14013	stream	tcp	nowait	root	/usr/local/sbin/fritzident fritzindent -l /var/log/fritzident.log"

@@ -23,6 +23,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <pwd.h>
+#include <sys/socket.h>
 
 #include "netinfo.h"
 #include "userinfo.h"
@@ -137,9 +138,11 @@ void execUDP(const char *ipv4, const char *port)
 void handleCmd()
 {
 	char cmd[256];
+
+
 	debugLog("Sending prompt\n");
 	sendResponse("AVM IDENT\r\n");
-	if (fgets(cmd, 256, stdin)) {
+	while (fgets(cmd, 256, stdin)) {
 		char *cmdVerb = strtok(cmd, "\r\n ");
 		debugLog("Received command \"%s\"\n", cmdVerb);
 		if (strcmp(cmdVerb, "USERS") == 0) {

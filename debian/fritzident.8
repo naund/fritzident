@@ -1,7 +1,7 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 .\" (C) Copyright 2013 Nils Naumann <nau@gmx.net>,
 .\"
-.TH FRITZIDENT 8 "October 27, 2013"
+.TH FRITZIDENT  "Mai 22, 2015"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -18,7 +18,7 @@
 fritzident \- parental control for Fritz!Box
 .SH SYNOPSIS
 .B fritzident
-.RI [ options ] " files" ...
+.RI [ options ]
 .br
 .SH DESCRIPTION
 This manual page documents briefly the
@@ -28,17 +28,15 @@ daemon.
 .\" TeX users may be more comfortable with the \fB<whatever>\fP and
 .\" \fI<whatever>\fP escape sequences to invode bold face and italics,
 .\" respectively.
-\fBfritzident\fP is a program that eneabeling the parental control
-function of the AVM Fritz!Box.
-It mimics the standard AVM Windows application that allows the Fritz!Box to
-recognize individual users connecting to the internet.
-.br 
-This application is supposed to run under control of inetd.
+\fBfritzident\fP is a program that eneabeling the parental control function of
+the AVM Fritz!Box.  It mimics the standard AVM Windows application that allows
+the Fritz!Box to recognize individual users connecting to the internet.  
+.br
+This application is supposed to run under control of inetd or systemd.
 .SH Internal working
-At startup, fritzident sends out a prompt message, then waits for a
-single command, and sends the response.
-The prompt message is "AVM IDENT", and is required for the Fritz!Box to
-recognize the agent.
+At startup, fritzident sends out a prompt message, then waits for a single
+command, and sends the response.  The prompt message is "AVM IDENT", and is
+required for the Fritz!Box to recognize the agent.
 .PP
 Recognized commands:
 .IP USERS
@@ -49,29 +47,24 @@ return the name of the user for the specified local TCP port.
 idem, but for UDP ports.
 .PP
 The prompt, as well as all replies, are terminated by a CR & NL (ASC 13 + ASC
-10).
-Commands are recognized with either CR & NL or just NL line termination.
+10).  Commands are recognized with either CR & NL or just NL line termination.
 This allows fritzident to be tested interactively.
 .SH OPTIONS
 These programs follow the usual GNU command line syntax, with long options
-starting with two dashes (`-').
-A summary of options is included below.
-.TP
-.B \-l, \-\-log file
-eneabeling logging into the specified file.
+starting with two dashes (`-').  A summary of options is included below.
 .TP
 .B \-d, \-\-domain
 fake a Windows domain.
 .TP
 .B \-?, \-\-help
-display this help and exit.
+display help and exit.
 .SH COPYRIGHT
 Copyright \(co 2013 Andre Larbiere <andre@larbiere.eu>
 .br
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
 .br
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
+This is free software: you are free to change and redistribute it.  There is NO
+WARRANTY, to the extent permitted by law.
 .SH SEE ALSO
 .BR inetd (8).
 .br

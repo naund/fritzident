@@ -22,27 +22,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-static char *logfilename=NULL;
-static FILE *logfile=NULL;
-
-void debugLogFile(const char *file)
-{
-	if (logfilename) free(logfilename);
-	if (logfile) fclose(logfile);
-
-	logfilename = strdup(file);
-	logfile = fopen(logfilename, "a");	
-}
+#include <syslog.h>
 
 void debugLog(const char *fmsg, ...)
 {
+	char msg[256];
 	va_list args;
-	if (logfile == NULL) return;
 
 	va_start(args, fmsg);
-	vfprintf(logfile, fmsg, args);
-	fflush(logfile);
+	vsnprintf(msg, sizeof(msg), fmsg, args);
 	va_end(args);
+	syslog(LOG_DEBUG, "%s", msg);
 }
 

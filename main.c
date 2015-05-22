@@ -38,10 +38,10 @@ int main(int argc, char *argv[])
 	while (1) {
 	   int option_index = 0;
 	   static struct option long_options[] = {
-		   {"log",		required_argument, NULL, 'l'},
+		   {"log",	optional_argument, NULL, 'l'},
 		   {"domain",   required_argument, NULL, 'd'},
-		   {"help",   required_argument, NULL, '?'},
-		   {0,         0,                 0,  0 }
+		   {"help",	required_argument, NULL, '?'},
+		   {0,		0,                 0,  0 }
 	   };
 
        c = getopt_long(argc, argv, "l:d:",
@@ -51,7 +51,6 @@ int main(int argc, char *argv[])
 
        switch (c) {
 		   case 'l':
-			   debugLogFile(optarg);
 	           break;
 		   case 'd':
 			   set_default_domain(optarg);
@@ -61,7 +60,7 @@ int main(int argc, char *argv[])
 			   return 0;
 		   default:
 			   fprintf(stderr, "Unknown option\n");
-			   fprintf(stderr, "Usage: avmident [-l logfile] [-d domain]\n");
+			   fprintf(stderr, "Usage: fritzident [-l logfile] [-d domain]\n");
 			   return 1;
 	   }
 	}

@@ -17,5 +17,4 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-void debugLogFile(const char *file);
 void debugLog(const char *fmsg, ...);

@@ -1,10 +1,10 @@
 [Unit]
-Description=Parental control daemon of AVM Fritz!Box
+Description=Parental control daemon of Fritz!Box %I
 Documentation=man:fritzident(8)
 Requires=fritzident.socket
 
 [Service]
-ExecStart=-/usr/sbin/fritzident -l /var/log/fritzident.log
+ExecStart=/usr/sbin/fritzident -l /var/log/fritzident.log
 StandardInput=socket
 
 [Install]

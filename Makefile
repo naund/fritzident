@@ -1,13 +1,13 @@
 CC = gcc
-CFLAGS=-O2 -Wall -pedantic
+CFLAGS=-O2 -Wall  #-pedantic
 BINDIR = $(DESTDIR)/usr/sbin
 NAME = fritzident
 
 fritzident: debug.o main.o netinfo.o userinfo.o
-	cc -o fritzident debug.o main.o netinfo.o userinfo.o
+	cc -o fritzident debug.o main.o netinfo.o userinfo.o -lsystemd
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS)  $<
 
 install:
 	install -d $(BINDIR)

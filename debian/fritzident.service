@@ -1,0 +1,11 @@
+[Unit]
+Description=Parental control daemon of Fritz!Box
+Documentation=man:fritzident(8)
+Requires=fritzident.socket
+
+[Service]
+ExecStart=/usr/sbin/fritzident
+#StandardInput=socket
+
+[Install]
+WantedBy=multi-user.target

@@ -23,10 +23,10 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <string.h>
+#include <unistd.h> 
 #include <pwd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-//#include <resolv.h>
 #include <errno.h>
 #include <systemd/sd-daemon.h>
 
@@ -35,7 +35,7 @@
 #include "userinfo.h"
 #include "debug.h"
 
-#define SOCKET 14013 /* Fritzident Socket */
+#define PORT 14013 /* Fritzident port */ 
 
 void SocketServer();
 void usage(const char *cmdname);
@@ -43,17 +43,20 @@ void usage(const char *cmdname);
 int main(int argc, char *argv[])
 {
     int c;
-
+    int Port = PORT;  /* initializing port with default fritzident port */
+    
+    
     while (1) {
         int option_index = 0;
         static struct option long_options[] = {
             {"verbose",	no_argument, NULL, 'v'},
             {"domain",   required_argument, NULL, 'd'},
+            {"port",   required_argument, NULL, 'p'},
             {"help",	no_argument, NULL, '?'},
             {0,		0,                 0,  0 }
         };
 
-        c = getopt_long(argc, argv, "vd:",
+        c = getopt_long(argc, argv, "vd:p:",
                         long_options, &option_index);
         if (c == -1)
             break;
@@ -64,12 +67,15 @@ int main(int argc, char *argv[])
         case 'd':
             set_default_domain(optarg);
             break;
+	case 'p':
+	    Port = atoi(optarg);
+	    break;
         case '?':
             usage(argv[0]);
             return 0;
         default:
             fprintf(stderr, "Unknown option\n");
-            fprintf(stderr, "Usage: fritzident [-v] [-d domain]\n");
+            fprintf(stderr, "Usage: fritzident [-v] [-p Port] [-d domain]\n");
             return 1;
         }
     }
@@ -77,7 +83,7 @@ int main(int argc, char *argv[])
     add_uid_range (1000, 65533);
     add_uid_range (65537,(uid_t) -1);
 
-    SocketServer();
+    SocketServer(Port);
     return 0;
 }
 
@@ -149,15 +155,19 @@ void execUDP(int client_fd, const char *ipv4, const char *port)
 }
 
 
-void SocketServer()
+void SocketServer(int Port)
 {
     int socket_fd;
+    int client_fd;
     struct sockaddr_in self;
     char cmd[256];
     int n;
+    struct sockaddr_in client_addr;
+    socklen_t addrlen = sizeof(client_addr);
+    ssize_t nSent;
 
     n = sd_listen_fds(0); /* number of file descriptors passed by systemd */
-      
+
     /* debugLog("Got %i file descriptors from systemd", n); */
     if (n > 1) {
 	    debugLog("Too many file descriptors received.\n");
@@ -176,7 +186,7 @@ void SocketServer()
 	bzero(&self, sizeof(self));
 
 	self.sin_family = AF_INET;
-	self.sin_port = htons(SOCKET);
+	self.sin_port = htons(Port);
 	self.sin_addr.s_addr = INADDR_ANY;
 
 	/* Bind port to socket */
@@ -194,25 +204,21 @@ void SocketServer()
 	}
     }
 
+
+    /* Await a connection on socket_fd*/
+    client_fd = accept(socket_fd, (struct sockaddr*) &client_addr, &addrlen);
+    /*debugLog("%s:%d connected\n", inet_ntoa(client_addr.sin_addr),
+     *		 ntohs(client_addr.sin_port)); */
+    
+    nSent = send(client_fd, "AVM IDENT\r\n", sizeof("AVM IDENT\r\n"), 0);
+    if(nSent < 0) {
+      debugLog("Sending \"AVM IDENT\" failed!");
+      exit(-1);
+    }
+
     /* Infinite loop */
     while (1)
     {
-        int client_fd;
-        ssize_t nSent;
-        struct sockaddr_in client_addr;
-        socklen_t addrlen = sizeof(client_addr);
-
-        /* Await a connection on socket_fd*/
-        client_fd = accept(socket_fd, (struct sockaddr*) &client_addr, &addrlen);
-        /*debugLog("%s:%d connected\n", inet_ntoa(client_addr.sin_addr),
-		 ntohs(client_addr.sin_port)); */
-
-        nSent = send(client_fd, "AVM IDENT\r\n", sizeof("AVM IDENT\r\n"), 0);
-        if(nSent < 0) {
-            debugLog("Sending \"AVM IDENT\" failed!");
-            exit(-1);
-        }
-
         /* wait for data */
         recv(client_fd, cmd, 256, 0);
 
@@ -228,7 +234,9 @@ void SocketServer()
             char *localIp = strtok(NULL, ":");
             char *localPort = strtok(NULL, "\r\n");
             /* debugLog("Searching for \"%s:%s\"\n", localIp, localPort); */
-            execTCP(client_fd, localIp, localPort);
+	    if(localIp != NULL && localPort != NULL)
+	      execTCP(client_fd, localIp, localPort);
+	    else sendResponse(client_fd, "ERROR UNSPECIFIED\r\n");
         }
         else if (strcmp(cmdVerb, "UDP") == 0) {
             char *localIp = strtok(NULL, ":");
@@ -240,11 +248,10 @@ void SocketServer()
             debugLog("Unrecognized command \"%s\"\r\n", cmdVerb);
             sendResponse(client_fd, "ERROR UNSPECIFIED\r\n");
         }
-
-        /* Close data connection */
-        close(client_fd);
     }
 
+    /* Close data connection */
+    close(client_fd);
     /* Finally some housekeeping */
     close(socket_fd);
 }

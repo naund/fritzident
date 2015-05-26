@@ -1,27 +1,35 @@
+Description
+===========
+fritzident  is a program that eneabeling the parental control function of the 
+AVM Fritz!Box.  It mimics the stan‐ dard AVM Windows application that allows the 
+Fritz!Box to recognize individual users connecting to the internet. This 
+application is supposed to run under control of inetd or systemd.
+
 General Information
 ===================
-Fritzident is supposed to run under control of inetd. It assumes that its stdin and stdout are already connected and immediately starts the communication.
-
-The provided Makefile can be used to compile the program. Obviously, a the make utility, a C compiler and base C libraries need to be installed for this to work. Compilation has been tested on Ubuntu 13.04.
+Fritzident will run as an stand alone server. The provided Makefile can be used 
+to compile the program. Obviously, a the make utility, a C compiler and base C 
+libraries need to be installed for this to work. Compilation has been tested on 
+Ubuntu 15.04.
 
 Installation
 ============
-To install fritzident, copy the executable program to an appropriate location and add a line to /etc/inetd.conf to start it for incoming TCP connections on port 14013. E.g.
-
-# /etc/inet.conf
-14013	stream	tcp	nowait	root	/usr/local/sbin/fritzident fritzindent
-
+To install fritzident, copy the executable program to an appropriate location 
+and start the server after establishing the network services.  You can use the 
+provides systemd unit files or the init.d script. An inetd is no longer needed.
 
 Internal working
 ================
-
-At startup, fritzident sends out a prompt message, then waits for a single command, and sends the response.
-The prompt message is "AVM IDENT", and is required for the Fritz!Box to recognize the agent.
+At startup fritzident is creating a socket on the port 14013 and sends out a 
+prompt message, then waits for a single command, and sends the response. The 
+prompt message is "AVM IDENT", and is required for the Fritz!Box to recognize 
+the agent.
 
 Recognized commands:
 	USERS		return a list of known users
-	TCP ip:port	return the name of the user for the specified local TCP port
+	TCP ip:port	return name of the user for the specified local TCP port
 	UDP ip:port	idem, but for UDP ports
 
-The prompt, as well as all replies, are terminated by a CR & NL (ASC 13 + ASC 10). Commands are recognized with either CR & NL or just NL line termination. This allows fritzident to be tested interactively.
-
+The prompt, as well as all replies, are terminated by a CR & NL (ASC 13 + ASC 
+10). Commands are recognized with either CR & NL or just NL line termination. 
+This allows fritzident to be tested interactively.

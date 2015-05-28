@@ -76,8 +76,8 @@ uid_t ipv4_tcp_port_uid(const char *ipv4, unsigned int port)
 	    if (strcmp(local, bindstring)==0) {
             unsigned long id;
             sscanf(uid, "%lu", &id);
-			debugLog("Found UID=%lu\n", id);
-			fclose(portlist);
+	    //debugLog("Found UID=%lu\n", id);
+	    fclose(portlist);
             return (uid_t)id;
 	    }
 	}
@@ -106,8 +106,8 @@ uid_t ipv4_udp_port_uid(const char *ipv4, unsigned int port)
 	    if (strcmp(local, bindstring)==0) {
             unsigned long id;
             sscanf(uid, "%lu", &id);
-			debugLog("Found UID=%lu\n", id);
-			fclose(portlist);
+	    //debugLog("Found UID=%lu\n", id);
+	    fclose(portlist);
             return (uid_t)id;
 	    }
 	}

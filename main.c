@@ -277,7 +277,7 @@ void SocketServer(int Port)
 
 void usage(const char *cmdname)
 {
-    printf("Usage: %s [-p Port] [-d domain]\n\n", cmdname);
+    printf("Usage: %s [-l logfile] [-d domain]\n\n", cmdname);
     printf("Answer Fritz!Box user identification requests.\n\n");
     printf("%s mimics the standard AVM Windows application that allows the Fritz!Box to recognize individual users connecting to the Internet.\n", cmdname);
     printf("Options:\n");

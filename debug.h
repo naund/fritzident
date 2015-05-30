@@ -17,4 +17,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-void debugLog(const char *fmsg, ...);
+void raiseVerbosity();
+void debugLog(int pri, const char *fmsg, ...);
+void initLogging();

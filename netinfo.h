@@ -17,8 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include <pwd.h>
-#define UID_SYSTEM	  0				// returned for ports that are owned by a system user
-#define UID_NOT_FOUND ((uid_t)-1)   // returned if port is not found
+#define UID_SYSTEM	  0	/* returned for ports that are owned by a system user */
+#define UID_NOT_FOUND ((uid_t)-1)   /* returned if port is not found */
 
 uid_t ipv4_tcp_port_uid(const char *ipv4, unsigned int port);
 uid_t ipv4_udp_port_uid(const char *ipv4, unsigned int port);

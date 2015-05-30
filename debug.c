@@ -22,16 +22,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syslog.h>
+#include <sys/syslog.h>
 
-void debugLog(const char *fmsg, ...)
+
+void debugLog(int pri, const char *fmsg, ...)
 {
-	char msg[256];
 	va_list args;
-
+	
 	va_start(args, fmsg);
-	vsnprintf(msg, sizeof(msg), fmsg, args);
+	vsyslog(pri, fmsg, args);
 	va_end(args);
-	syslog(LOG_DEBUG, "%s", msg);
 }
 
+
+/**
+ * @brief Increase verbositx by one, max value = 7
+ * 
+ * @return void
+ */
+void raiseVerbosity()
+{
+  setlogmask((setlogmask(0) << 1) +1);
+}
+
+void initLogging(){
+  setlogmask(LOG_UPTO(4));
+}

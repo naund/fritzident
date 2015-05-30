@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS= -Wall  -pedantic
+CFLAGS= -Wall  
 BINDIR = $(DESTDIR)/usr/sbin
 NAME = fritzident
 

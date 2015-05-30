@@ -25,6 +25,7 @@
 #include <string.h>
 #include <unistd.h> 
 #include <pwd.h>
+#include <syslog.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -45,8 +46,9 @@ int main(int argc, char *argv[])
 {
     int c;
     int Port = PORT;  /* initializing port with default fritzident port */
-    
-    
+   
+   initLogging();
+   
     while (1) {
         int option_index = 0;
         static struct option long_options[] = {
@@ -63,8 +65,9 @@ int main(int argc, char *argv[])
             break;
 
         switch (c) {
-        case 'v':  /* FIXME implementieren */
-            break;
+        case 'v':
+	  raiseVerbosity();
+	  break;
         case 'd':
             set_default_domain(optarg);
             break;
@@ -85,21 +88,25 @@ int main(int argc, char *argv[])
     add_uid_range (65537,(uid_t) -1);
 
     SocketServer(Port);
+  
     return 0;
 }
 
 void sendResponse(int client_fd, const char *response, ...)
 {
     char msg[BUFFER];
+    int n;
+    ssize_t nSent;
+    
     va_list args;
     va_start(args, response);
-    int n = vsnprintf(msg, sizeof(msg), response, args);
+    n = vsnprintf(msg, sizeof(msg), response, args);
     va_end(args);
 
-    ssize_t nSent = send(client_fd, msg, n+1, 0);
+    nSent = send(client_fd, msg, n+1, 0);
     if(nSent < n+1){
-      debugLog("Sending Response failed: %s", msg);
-      debugLog("send: %s\n", strerror(errno));
+      debugLog(LOG_ERR, "Sending Response failed: %s", msg);
+      debugLog(LOG_ERR, "send: %s\n", strerror(errno));
       exit(errno);
     }
 }
@@ -109,7 +116,7 @@ void execUSERS(int client_fd)
     struct passwd *userinfo = getpwent();
     while (userinfo) {
         if (included_uid(userinfo->pw_uid)) {
-	    /* debugLog("USERS: %s\n", add_default_domain(userinfo->pw_name)); */
+	    debugLog(LOG_DEBUG, "USERS: %s\n", add_default_domain(userinfo->pw_name));
             sendResponse(client_fd, "%s\r\n", add_default_domain(userinfo->pw_name));
         }
         userinfo = getpwent();
@@ -127,7 +134,7 @@ void execTCP(int client_fd, const char *ipv4, const char *port)
         if (included_uid(uid)) {
             struct passwd *user;
             user = getpwuid(uid);
-            /* debugLog("TCP %s: %s\n", port, user->pw_name); */
+            debugLog(LOG_DEBUG, "TCP %s: %s\n", port, user->pw_name);
             sendResponse(client_fd, "USER %s\r\n", add_default_domain(user->pw_name));
         }
         else
@@ -148,7 +155,7 @@ void execUDP(int client_fd, const char *ipv4, const char *port)
         if (included_uid(uid)) {
             struct passwd *user;
             user = getpwuid(uid);
-            debugLog("UDP %s: %s\n", port, user->pw_name);
+            debugLog(LOG_DEBUG, "UDP %s: %s\n", port, user->pw_name);
             sendResponse(client_fd, "USER %s\r\n", add_default_domain(user->pw_name));
         }
         else
@@ -175,16 +182,16 @@ void SocketServer(int Port)
 
     /* debugLog("Got %i file descriptors from systemd", n); */
     if (n > 1) {
-	    debugLog("Too many file descriptors received.\n");
+	    debugLog(LOG_ERR, "Too many file descriptors received.\n");
 	    exit(1);
     } else if(n == 1){
-	    /* debugLog("Socket passed by systemd"); */
+	    debugLog(LOG_DEBUG, "Socket passed by systemd");
 	    socket_fd = SD_LISTEN_FDS_START + 0;
     }
     else {
-      debugLog("Creating socket\n");
+      debugLog(LOG_INFO, "Creating socket\n");
       if((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-	debugLog("socket: %s\n", strerror(errno));
+	debugLog(LOG_ERR, "socket: %s\n", strerror(errno));
 	exit(errno);
       }
 
@@ -193,20 +200,20 @@ void SocketServer(int Port)
       self.sin_port = htons(Port);
       self.sin_addr.s_addr = INADDR_ANY;
 
-      debugLog("Binding port to socket\n");
+      debugLog(LOG_INFO, "Binding port to socket\n");
       if(bind(socket_fd, (struct sockaddr*) &self, sizeof(self)) != 0 ) {
-	debugLog("bind: %s\n", strerror(errno));
+	debugLog(LOG_ERR, "bind: %s\n", strerror(errno));
 	exit(errno);
       }
 
       /* Make it a "listening socket" */
       if (listen(socket_fd, 20) != 0) {
-	debugLog("listen: %s\n", strerror(errno));
+	debugLog(LOG_ERR, "listen: %s\n", strerror(errno));
 	exit(errno);
       }
     }
 
-    debugLog("fritzident daemon started om port %i\n", Port);
+    debugLog(LOG_INFO, "fritzident daemon started om port %i\n", Port);
 
     /* Infinite loop */
     while (1) {
@@ -216,7 +223,7 @@ void SocketServer(int Port)
       /* debugLog("Waiting for connection from fritz!box...\n"); */
       client_fd = accept(socket_fd, (struct sockaddr*) &client_addr, &addrlen);
       if(client_fd < 0){
-	debugLog("accept %s:%d connection failed: %s\n",
+	debugLog(LOG_ERR, "accept %s:%d connection failed: %s\n",
 		 inet_ntoa(client_addr.sin_addr),
 		 ntohs(client_addr.sin_port),
 		 strerror(errno));
@@ -225,7 +232,7 @@ void SocketServer(int Port)
       
       bytes = send(client_fd, "AVM IDENT\r\n", strlen("AVM IDENT\r\n")+1, 0);
       if(bytes < 0) {
-	debugLog("Sending \"AVM IDENT\" failed!");
+	debugLog(LOG_ERR, "Sending \"AVM IDENT\" failed!");
 	exit(-1);
       }
 
@@ -235,7 +242,7 @@ void SocketServer(int Port)
 
       if(bytes == 0) continue;
       else if(bytes < 0){
-	debugLog("recv: %s\n", strerror(errno));
+	debugLog(LOG_ERR, "recv: %s\n", strerror(errno));
 	exit(errno);
       }
 
@@ -251,7 +258,7 @@ void SocketServer(int Port)
       else if (strcmp(cmdVerb, "TCP") == 0) {
 	char *localIp = strtok(NULL, ":");
 	char *localPort = strtok(NULL, "\r\n");
-	/* debugLog("Searching for \"%s:%s\"\n", localIp, localPort); */
+	debugLog(LOG_DEBUG, "Searching for \"%s:%s\"\n", localIp, localPort);
 	if(localIp != NULL && localPort != NULL)
 	  execTCP(client_fd, localIp, localPort);
 	else sendResponse(client_fd, "ERROR UNSPECIFIED\r\n");
@@ -259,12 +266,12 @@ void SocketServer(int Port)
       else if (strcmp(cmdVerb, "UDP") == 0) {
 	char *localIp = strtok(NULL, ":");
 	char *localPort = strtok(NULL, "\r\n");
-	/* debugLog("Searching for \"%s:%s\"\n", localIp, localPort); */
+	debugLog(LOG_DEBUG, "Searching for \"%s:%s\"\n", localIp, localPort);
 	if(localIp != NULL && localPort != NULL)
 	  execUDP(client_fd, localIp, localPort);
 	else sendResponse(client_fd, "ERROR UNSPECIFIED\r\n");
       } else {
-	debugLog("Unrecognized command \"%s\"\n", cmd);
+	debugLog(LOG_NOTICE, "Unrecognized command \"%s\"\n", cmd);
 	sendResponse(client_fd, "ERROR UNSPECIFIED\r\n");
       }
       /* Close data connection */
@@ -281,7 +288,7 @@ void usage(const char *cmdname)
     printf("Answer Fritz!Box user identification requests.\n\n");
     printf("%s mimics the standard AVM Windows application that allows the Fritz!Box to recognize individual users connecting to the Internet.\n", cmdname);
     printf("Options:\n");
-    /* printf("\t-l logfile ..... write debug messages to the specified log file\n"); */
+    printf("\t-v increase verbosity (may be assed multiple times.\n");
     printf("\t-p Port to listen on if not 14013 (for debugging only)\n");
     printf("\t-d domain ...... fake a Windows domain\n");
     printf("\nLICENSE:\n");

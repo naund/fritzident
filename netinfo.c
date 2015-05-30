@@ -24,6 +24,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <syslog.h>
 
 #include "netinfo.h"
 
@@ -51,7 +52,7 @@ const char *ipv4_bindstring(const char *ipv4, unsigned int port)
 
 	sprintf(buffer, "%08X:%04X", ip_s.bin, port);
 
-//	debugLog("Bindstring \"%s\"\n", buffer);
+	debugLog(LOG_DEBUG, "Bindstring \"%s\"\n", buffer);
 	return buffer;
 }
 
@@ -76,13 +77,13 @@ uid_t ipv4_tcp_port_uid(const char *ipv4, unsigned int port)
 	    if (strcmp(local, bindstring)==0) {
             unsigned long id;
             sscanf(uid, "%lu", &id);
-	    //debugLog("Found UID=%lu\n", id);
+	    debugLog(LOG_DEBUG, "Found UID=%lu\n", id);
 	    fclose(portlist);
             return (uid_t)id;
 	    }
 	}
 	fclose(portlist);
-	debugLog("Not found\n");
+	debugLog(LOG_NOTICE, "UID fpr UDP Port %i Not found\n", port);
 	return UID_NOT_FOUND;
 }
 
@@ -106,13 +107,13 @@ uid_t ipv4_udp_port_uid(const char *ipv4, unsigned int port)
 	    if (strcmp(local, bindstring)==0) {
             unsigned long id;
             sscanf(uid, "%lu", &id);
-	    //debugLog("Found UID=%lu\n", id);
+	    debugLog(LOG_DEBUG, "Found UID=%lu\n", id);
 	    fclose(portlist);
             return (uid_t)id;
 	    }
 	}
 	fclose(portlist);
-	debugLog("Not found\n");
+	debugLog(LOG_NOTICE, "UID for TCP port %i Not found\n", port);
 	return UID_NOT_FOUND;
 }
 

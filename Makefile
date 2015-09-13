@@ -17,11 +17,13 @@ fritzident: debug.o main.o netinfo.o userinfo.o
 	$(CC) -c $(CFLAGS)  $<
 
 install-man:
-	install -d -m644 fritzident.8 $(MANDIR)
+	install -d $(MANDIR)
+	install -t -m644 fritzident.8 $(MANDIR)
 
 install-systemd:
-	install -d -m644 fritzident.service $(SYSTEMDDIR)
-	install -d -m644 fritzident.socket $(SYSTEMDDIR)
+	install -d $(SYSTEMDDIR)
+	install -t -m644 fritzident.service $(SYSTEMDDIR)
+	install -t -m644 fritzident.socket $(SYSTEMDDIR)
 
 install-bin:
 	install -d $(BINDIR)

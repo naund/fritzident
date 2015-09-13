@@ -4,7 +4,7 @@ LDFLAGS +=  `pkg-config --libs libsystemd`
 
 
 BINDIR = $(DESTDIR)/usr/sbin
-SYSTEMDDIR = /lib/systemd/system
+SYSTEMDDIR = $(DESTDIR)/lib/systemd/system
 MANDIR = $(DESTDIR)/usr/share/man/man8
 NAME = fritzident
 

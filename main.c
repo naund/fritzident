@@ -103,8 +103,8 @@ void sendResponse(int client_fd, const char *response, ...)
     n = vsnprintf(msg, sizeof(msg), response, args);
     va_end(args);
 
-    nSent = send(client_fd, msg, n+1, 0);
-    if(nSent < n+1){
+    nSent = send(client_fd, msg, n, 0);
+    if(nSent < n){
       debugLog(LOG_ERR, "Sending Response failed: %s", msg);
       debugLog(LOG_ERR, "send: %s\n", strerror(errno));
       exit(errno);
@@ -230,7 +230,7 @@ void SocketServer(int Port)
 	exit(errno);
       }
       
-      bytes = send(client_fd, "AVM IDENT\r\n", strlen("AVM IDENT\r\n")+1, 0);
+      bytes = send(client_fd, "AVM IDENT\r\n", strlen("AVM IDENT\r\n"), 0);
       if(bytes < 0) {
 	debugLog(LOG_ERR, "Sending \"AVM IDENT\" failed!");
 	exit(-1);
